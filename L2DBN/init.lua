@@ -9,11 +9,12 @@ local StateMachine  = require(_PACKAGE..'StateMachine');
 local Rect          = require(_PACKAGE..'Rect');
 local Bounds        = require(_PACKAGE..'Bounds');
 local SubScene      = require(_PACKAGE..'SubScene');
+local CombatTile    = require(_PACKAGE..'CombatTile');
+local CombatMap     = require(_PACKAGE..'CombatMap');
 local table         = require(_PACKAGE..'table');
 local push          = require(_PACKAGE..'push');
 local bind          = require(_PACKAGE..'bind');
 local image         = require(_PACKAGE..'image');
-
 
 return {
     Class           = Class,
@@ -23,6 +24,10 @@ return {
     Rect            = Rect,
     Bounds          = Bounds,
     SubScene        = SubScene,
+    battleNetwork   = {
+        CombatTile = CombatTile,
+        CombatMap = CombatMap
+    },
     table           = table,
     push            = push,
     bind            = bind,
