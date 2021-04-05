@@ -9,12 +9,12 @@ local tile_states = {
 }
 
 local function invalidMove()
-    return;
+    return false;
 end
 
-function CombatTile:init(parent,x,y)
-    self.parent = parent;
-    self.index = (y - 1) * self.parent.width + x;
+function CombatTile:init(map,x,y)
+    self.map = map;
+    self.index = (y - 1) * self.map.width + x;
     self.x = x;
     self.y = y;
     self.occupying = nil;
@@ -24,13 +24,13 @@ function CombatTile:init(parent,x,y)
 
     if self.x == 1 then
         self.moveLeft = invalidMove;
-    elseif self.x == self.parent.width then
+    elseif self.x == self.map.width then
         self.moveRight = invalidMove;
     end
 
     if self.y == 1 then
         self.moveUp = invalidMove;
-    elseif self.y == self.parent.height then 
+    elseif self.y == self.map.height then 
         self.moveDown = invalidMove
     end
 end
@@ -59,9 +59,9 @@ function CombatTile:isOccupied()
 end
 
 function CombatTile:move(n)
-    local board = self.parent.board;
+    local board = self.map.board;
     local move_to = board[self.index + n];
-    if not move_to:getOccupying() then
+    if not move_to.occupying then
         local occupying = self.occupying;
         self:removeOccupying();
         move_to:setOccupying(occupying);
@@ -71,25 +71,25 @@ function CombatTile:move(n)
 end
 
 function CombatTile:moveLeft()
-    self:move(-1);
+    return self:move(-1);
 end
 
 function CombatTile:moveRight()
-    self:move(1);
+    return self:move(1);
 end
 
 function CombatTile:moveUp()
-    self:move(-self.parent.width);
+    return self:move(-self.map.width);
 end
 
 function CombatTile:moveDown()
-    self:move(self.parent.width);
+    return self:move(self.map.width);
 end
 
 function CombatTile:update(dt)
     self.state_timer = self.state_timer - dt;
     if self.state_timer <= 0 then
-        self.state_timer = tile_states.normal;
+        self.state = tile_states.normal;
     end
     local occupying = self.occupying;
     if occupying then
@@ -98,23 +98,30 @@ function CombatTile:update(dt)
 end
 
 function CombatTile:render()
-    local parent        = self.parent;
-    local start_x       = parent.start_x;
-    local start_y       = parent.start_y;
-    local tileWidth     = parent.tileWidth;
-    local tileHeight    = parent.tileHeight;
-    local padding       = parent.tile_padding;
+    local map        = self.map;
+    local start_x       = map.start_x;
+    local start_y       = map.start_y;
+    local tileWidth     = map.tileWidth;
+    local tileHeight    = map.tileHeight;
+    local padding       = map.tile_padding;
+    local mult_x        = (self.x - 1);
+    local mult_y        = (self.y - 1);
+    local x = start_x + (tileWidth * mult_x) + (padding * mult_x);
+    local y = start_y + (tileHeight * mult_y) + (padding * mult_y);
     setColor(unpack(self.color));
     rectangle(
         'fill',
-        start_x + (tileWidth * (self.x - 1)) + padding,
-        start_y + (tileHeight * (self.x - 1)) + padding,
+        x,
+        y,
         tileWidth,
         tileHeight
     );
     local occupying = self.occupying;
     if occupying then
-        occupying:render();
+        occupying:render(
+            x + math.floor(tileWidth / 2),
+            y + math.floor(tileHeight / 2)
+        );
     end
 end
 

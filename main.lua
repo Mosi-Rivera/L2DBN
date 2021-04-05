@@ -4,6 +4,8 @@ local DefaultScene = require('scenes/DefaultScene');
 function love.load()
     love.graphics.setDefaultFilter('nearest','nearest',1);
 
+    largeFont = love.graphics.newFont('assets/fonts/font.ttf',32);
+
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
         resizable = true,
@@ -82,11 +84,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    push:apply('start');
-    --
     sceneManager:render()
-    --
-    push:apply('end');
 end
 
 function love.quit()

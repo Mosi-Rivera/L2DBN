@@ -1,60 +1,114 @@
-local Scene = L2DBN.Scene;
-local Rect  = L2DBN.Rect;
-local printf = love.graphics.printf;
+local Scene     = L2DBN.Scene;
+local Rect      = L2DBN.Rect;
+local Actor     = L2DBN.combat.Actor;
+local CombatMap = L2DBN.combat.Map;
+local BNTile    = L2DBN.combat.Tile;
+local printf    = love.graphics.printf;
+local setColor  = love.graphics.setColor;
 
-local BounceRect = Class{__includes = Rect};
+--MAP
+local BNMap = Class{__includes = CombatMap};
 
-function BounceRect:init()
-    Rect.init(
-        self,
-        math.floor(VIRTUAL_WIDTH / 2),
-        math.floor(VIRTUAL_HEIGHT / 2),
-        100,
-        100,
-        0.5,
-        0.5
+function BNMap:init(config)
+    CombatMap.init(self,config);
+    self:setTileOccupying(
+        config.Player(self),
+        2,
+        2
     );
-    self.speedX = 50;
-    self.speedY = 100;
 end
 
-function BounceRect:update(dt)
-    local nx = self.x + math.floor(self.speedX * dt);
-    local ny = self.y + math.floor(self.speedY * dt);
+--PLAYER
+local Player = Class{__includes = Actor};
 
-    if nx + self.right > VIRTUAL_WIDTH then
-        self.speedX = -self.speedX;
-        nx = VIRTUAL_WIDTH - self.right;
-    elseif nx + self.left < 0 then
-        self.speedX = -self.speedX;
-        nx = -self.left;
-    end
+local MoveCooldownTime = 0.2;
+local MoveBufferTime = 0.15;
 
-    if ny + self.bottom > VIRTUAL_HEIGHT then
-        self.speedY = -self.speedY;
-        ny = VIRTUAL_HEIGHT - self.bottom;
-    elseif ny + self.top < 0 then
-        self.speedY = -self.speedY;
-        ny = -self.top;
-    end
+function Player:init(map)
+    Actor.init(self,{
+        map = map,
+        w = 26,
+        h = 40
+    });
+    self.moveCooldown = 0;
+    self.moveDirection = nil;
+    self.moveBuffer = 0;
+    self.stateManager:addState(
+        'normal',
+        nil,
+        bind(self,function(self,dt)
+            if love.keyboard.wasPressed('right') then
+                self.moveDirection = 2;
+                self.moveBuffer = MoveBufferTime;
+            elseif love.keyboard.wasPressed('left') then
+                self.moveDirection = 4;
+                self.moveBuffer = MoveBufferTime;
+            elseif love.keyboard.wasPressed('up') then
+                self.moveDirection = 1;
+                self.moveBuffer = MoveBufferTime;
+            elseif love.keyboard.wasPressed('down') then
+                self.moveDirection = 3;
+                self.moveBuffer = MoveBufferTime;
+            end
 
-    self.x = nx;
-    self.y = ny;
+            if self.moveBuffer > 0 and self.moveCooldown <= 0 then
+                local moved = false;
+                local moveDirection = self.moveDirection;
+                if  moveDirection == 1 then
+                    moved = self.tile:moveUp();
+                elseif moveDirection == 2 then
+                    moved = self.tile:moveRight();
+                elseif moveDirection == 3 then
+                    moved = self.tile:moveDown();
+                elseif moveDirection == 4 then
+                    moved = self.tile:moveLeft();
+                end
+                if moved then
+                    self.moveCooldown = MoveCooldownTime;
+                    self.moveBuffer = 0;
+                end
+            end
+        end),
+        nil,
+        nil,
+        true
+    );
 end
+
+function Player:update(dt)
+    self.moveCooldown = self.moveCooldown - dt;
+    self.moveBuffer = self.moveBuffer - dt;
+    self.stateManager:update(dt);
+end
+
+--SCENE
 
 local DefaultScene = Class{__includes = Scene};
 
 function DefaultScene:init()
-    Scene.init(self);
-    self.rect = BounceRect();
+    love.graphics.setFont(largeFont);
+    self.map = BNMap({
+        width = 8,
+        height = 4,
+        tileWidth = 32,
+        tileHeight = 24,
+        scene = self,
+        padding = 10,
+        CombatTile = BNTile,
+        Player = Player
+    });
 end
 
 function DefaultScene:update(dt)
-    self.rect:update(dt);
+    self.map:update(dt);
 end
 
 function DefaultScene:render()
-    self.rect:render();
+    push:apply('start');
+    --
+    self.map:render();
+    --
+    push:apply('end');
 end
 
 return DefaultScene;

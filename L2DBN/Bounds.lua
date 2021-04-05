@@ -14,10 +14,10 @@ function Bounds:setSize(w,h)
 end
 
 function Bounds:setOrigin(originX,originY)
-    self.left   = -(self.w * originX);
-    self.right  = self.w + self.left;
-    self.top    = -(self.h * originY);
-    self.bottom = self.h + self.top;
+    self.left   = math.floor(-(self.w * originX));
+    self.right  = math.ceil(self.w + self.left);
+    self.top    = math.floor(-(self.h * originY));
+    self.bottom = math.ceil(self.h + self.top);
 end
 
 return Bounds;

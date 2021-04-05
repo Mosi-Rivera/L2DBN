@@ -11,6 +11,7 @@ local Bounds        = require(_PACKAGE..'Bounds');
 local SubScene      = require(_PACKAGE..'SubScene');
 local CombatTile    = require(_PACKAGE..'CombatTile');
 local CombatMap     = require(_PACKAGE..'CombatMap');
+local CombatActor   = require(_PACKAGE..'CombatActor');
 local table         = require(_PACKAGE..'table');
 local push          = require(_PACKAGE..'push');
 local bind          = require(_PACKAGE..'bind');
@@ -24,9 +25,11 @@ return {
     Rect            = Rect,
     Bounds          = Bounds,
     SubScene        = SubScene,
-    battleNetwork   = {
-        CombatTile = CombatTile,
-        CombatMap = CombatMap
+    combat   = {
+        Tile = CombatTile,
+        Map = CombatMap,
+        Actor = CombatActor
+        
     },
     table           = table,
     push            = push,
