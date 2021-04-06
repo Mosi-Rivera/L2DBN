@@ -24,6 +24,8 @@ function love.load()
 
     love.keyboard.keysPressed = {};
     love.keyboard.keysReleased = {};
+    love.mouse.mx = 0;
+    love.mouse.my = 0;
 end
 
 function love.resize(w, h)
@@ -54,10 +56,13 @@ function love.keyboard.wasReleased(key)
     end
 end
 
+function love.mouse.mouseToWorldPos(x,y)
+    return x / push._SCALE.x + push._OFFSET.x, y / push._SCALE.y + push._OFFSET.y;
+end
+
 function love.mousepressed(x,y,button,istouch)
     love.mouse.pressed = { --TODO: FIX
-        x / push._SCALE.x + push._OFFSET.x ,
-        y / push._SCALE.y + push._OFFSET.y,
+        love.mouse.mouseToWorldPos(x,y),
         button,
         istouch
     };
@@ -80,6 +85,7 @@ function love.update(dt)
 
     love.keyboard.keysPressed = {}
     love.keyboard.keysReleased = {}
+    love.mouse.mx, love.mouse.my = love.mouse.mouseToWorldPos(love.mouse.getPosition());
     love.mouse.pressed = nil;
 end
 

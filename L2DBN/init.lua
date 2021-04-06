@@ -8,6 +8,7 @@ local Scene         = require(_PACKAGE..'Scene');
 local StateMachine  = require(_PACKAGE..'StateMachine');
 local Rect          = require(_PACKAGE..'Rect');
 local Bounds        = require(_PACKAGE..'Bounds');
+local Button        = require(_PACKAGE..'Button');
 local SubScene      = require(_PACKAGE..'SubScene');
 local CombatTile    = require(_PACKAGE..'CombatTile');
 local CombatMap     = require(_PACKAGE..'CombatMap');
@@ -25,6 +26,7 @@ return {
     Rect            = Rect,
     Bounds          = Bounds,
     SubScene        = SubScene,
+    Button          = Button,
     combat   = {
         Tile = CombatTile,
         Map = CombatMap,
