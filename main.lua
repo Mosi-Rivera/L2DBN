@@ -61,11 +61,13 @@ function love.mouse.mouseToWorldPos(x,y)
 end
 
 function love.mousepressed(x,y,button,istouch)
-    love.mouse.pressed = { --TODO: FIX
-        love.mouse.mouseToWorldPos(x,y),
-        button,
-        istouch
-    };
+	x, y = love.mouse.mouseToWorldPos(x,y);    
+	love.mouse.pressed = { --TODO: FIX
+        	x,
+		y,
+        	button,
+        	istouch
+    	};
 end
 
 function love.keyreleased(key)
